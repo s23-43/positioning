@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
 import argparse
+import sympy
 import sys
-from scipy.optimize import fsolve, minimize, root # TODO: Remove the unused library functions
 
 """
 Takes a string of numbers formatted with comma-separated numbers and returns a tuple-casted version.
 For example, if the string is "1,2.2,5,12", then the returned tuple will be (1.0, 2.2, 5.0, 12.0).
 """
-def convertStringListToFloats(numStr:str):
+def convertStringListToFloats(numStr:str) -> list:
 	strList = numStr.split(",")
 	numList = []
 	for s in strList:
@@ -50,21 +50,22 @@ def main():
 		# Verify that tuples of radii, x-coords, and y-coords are same length
 		if len(radii) != len(xCoords) or len(radii) != len(yCoords):
 			raise Exception(f"Mismatched sizes of lists:\n  {len(radii)} radii\n  {len(xCoords)} x-coords\n  {len(yCoords)} y-coords")
+		numOPs: int = len(radii)
 
 		# Estimate and print position
-		"""
-		FIXME: Out of necessity, our algorithm uses an overdetermined system of nonlinear equations.
-		Being "overdetermined" means that there are more nonlinear equations than unknown variables.
-		In the case of a X-equation system under ideal conditions and accurate measurements, there
-		could be a single solution (ideal) or up to X solutions (not ideal). The current issue is
-		that functions from `scipy` expect a 1:1 match between the number of equations and the
-		number of solutions. Need to find a way to fix this or at least work around it. Passing only
-		2 of 3 sets of radii, x-coords, and y-coords yields *a* solution, but not a solution that
-		makes sense with the given values.
-		"""
-		position = fsolve(systemOfEquations, [1, 1], args=(radii[0:2], xCoords[0:2], yCoords[0:2]))
-		#position = root(eqnHardCoded, [1, 1], args=(radii, xCoords, yCoords))
-		print(position, file=sys.stdout)
+		roots = list()
+		funcs = list()
+		x,y = sympy.symbols("x,y")
+		for i in range(0, numOPs):
+			funcs.append( sympy.Eq( \
+				radii[i]**2, \
+				x**2 - 2*xCoords[i]*x + xCoords[i]**2 + y**2 - 2*yCoords[i]*y + yCoords[i]**2 \
+			))
+		for i in range(0, numOPs):
+			for j in range(i+1, numOPs):
+				roots.append(sympy.solve([funcs[i], funcs[j]], (x,y)))
+				print(roots[i])
+		# TODO: Determine and print out the common root
 	except Exception as e:
 		print(e, file=sys.stderr)
 
