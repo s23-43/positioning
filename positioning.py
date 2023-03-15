@@ -4,11 +4,16 @@ import argparse
 import sympy
 import sys
 
-"""
-Takes a string of numbers formatted with comma-separated numbers and returns a tuple-casted version.
-For example, if the string is "1,2.2,5,12", then the returned tuple will be (1.0, 2.2, 5.0, 12.0).
-"""
 def convert_string_list_to_floats(numStr:str) -> list:
+	"""
+	Takes a string of numbers formatted with comma-separated numbers and returns a tuple-casted version. For example, if the string is "1,2.2,5,12", then the returned tuple will be (1.0, 2.2, 5.0, 12.0).
+
+	Args:
+		numStr (str): A comma-separated list of numbers
+
+	Returns:
+		A list with each number in the comma-separated list as its own entry in the list
+	"""
 	strList = numStr.split(",")
 	numList = []
 	for s in strList:
