@@ -20,6 +20,25 @@ def convert_string_list_to_floats(numStr: str) -> list:
 		numList.append(float(s))
 	return numList
 
+def calculate_roots(num: int, radii: list, xCoords: list, yCoords: list) -> list:
+	"""
+	TODO: Add function description
+	"""
+	funcs = list()
+	x,y = sympy.symbols("x,y")
+	for i in range(0, num):
+		funcs.append( sympy.Eq( \
+			radii[i]**2, \
+			x**2 - 2*xCoords[i]*x + xCoords[i]**2 + y**2 - 2*yCoords[i]*y + yCoords[i]**2 \
+		))
+
+	roots = list()
+	for i in range(0, num):
+		for j in range(i+1, num):
+			roots.append(sympy.solve([funcs[i], funcs[j]], (x,y)))
+
+	return roots
+
 def main():
 	# Parse arguments
 	parser = argparse.ArgumentParser()
@@ -45,18 +64,8 @@ def main():
 		numOPs: int = len(radii)
 
 		# Estimate and print position
-		roots = list()
-		funcs = list()
-		x,y = sympy.symbols("x,y")
-		for i in range(0, numOPs):
-			funcs.append( sympy.Eq( \
-				radii[i]**2, \
-				x**2 - 2*xCoords[i]*x + xCoords[i]**2 + y**2 - 2*yCoords[i]*y + yCoords[i]**2 \
-			))
-		for i in range(0, numOPs):
-			for j in range(i+1, numOPs):
-				roots.append(sympy.solve([funcs[i], funcs[j]], (x,y)))
-				print(roots[i])
+		roots = calculate_roots(numOPs, radii, xCoords, yCoords)
+		print(roots)
 		# TODO: Determine and print out the common root
 	except Exception as e:
 		print(e, file=sys.stderr)
