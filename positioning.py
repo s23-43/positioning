@@ -4,7 +4,7 @@ import argparse
 import sympy
 import sys
 
-def convert_string_list_to_floats(numStr:str) -> list:
+def convert_string_list_to_floats(numStr: str) -> list:
 	"""
 	Takes a string of numbers formatted with comma-separated numbers and returns a tuple-casted version. For example, if the string is "1,2.2,5,12", then the returned tuple will be (1.0, 2.2, 5.0, 12.0).
 
