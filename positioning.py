@@ -36,8 +36,44 @@ def calculate_roots(num: int, radii: list, xCoords: list, yCoords: list) -> list
 	for i in range(0, num):
 		for j in range(i+1, num):
 			roots.append(sympy.solve([funcs[i], funcs[j]], (x,y)))
-
 	return roots
+
+def estimate_position(roots: list) -> tuple[float, float]:
+	"""
+	TODO: Add function description
+	"""
+	coords = set()
+	for root in roots:
+		for coord in root:
+			assert len(coord) == 2
+			try:
+				x = float(coord[0])
+				y = float(coord[1])
+				coords.add( (x,y) )
+			except Exception as e:
+				if str(e) == "Cannot convert complex to float":
+					print(f"Found complex root: {coord}. Safe to disregard.", file=sys.stdout)
+				else:
+					raise e
+	# TODO: Estimate the position by iterating through the remaining coords
+	return (0,0)
+
+def pythag(a: tuple, b: tuple) -> float:
+	"""
+	Calculates distance between two 2D coordinates using the Pythagorean theorem
+
+	Args:
+		a (tuple): A 2D coordinate
+		b (tuple): A 2D coordinate
+
+	Returns:
+		The distance between the given coordinates
+	"""
+	assert len(a) == 2
+	assert len(b) == 2
+	x = ( a[0] - b[0] )**2
+	y = ( a[1] - b[1] )**2
+	return (x+y)**0.5
 
 def main():
 	# Parse arguments
@@ -65,8 +101,7 @@ def main():
 
 		# Estimate and print position
 		roots = calculate_roots(numOPs, radii, xCoords, yCoords)
-		print(roots)
-		# TODO: Determine and print out the common root
+		print(estimate_position(roots))
 	except Exception as e:
 		print(e, file=sys.stderr)
 
