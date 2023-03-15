@@ -4,7 +4,7 @@ import argparse
 import math
 import sys
 
-def calculateDistance(power_rx: float, power_tx: float, gain_rx: float, gain_tx: float, wavelength: float) -> float:
+def calculate_distance(power_rx: float, power_tx: float, gain_rx: float, gain_tx: float, wavelength: float) -> float:
 	"""
 	Calculates the distance between a receiver and a transmitter using the decibel form of the Friis transmission equation
 	Friis transmission equation (conventional form):
@@ -35,7 +35,7 @@ def main():
 	parser.add_argument("-wl", type=float, required=True, help="Signal wavelength. Output distance will be the same distance units as this")
 	args = parser.parse_args()
 
-	distance: float = calculateDistance(args.pr, args.pt, args.gr, args.gt, args.wl)
+	distance: float = calculate_distance(args.pr, args.pt, args.gr, args.gt, args.wl)
 	print(distance, file=sys.stdout) # output radius in same units as wavelength
 
 if __name__ == "__main__":

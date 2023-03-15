@@ -8,25 +8,12 @@ import sys
 Takes a string of numbers formatted with comma-separated numbers and returns a tuple-casted version.
 For example, if the string is "1,2.2,5,12", then the returned tuple will be (1.0, 2.2, 5.0, 12.0).
 """
-def convertStringListToFloats(numStr:str) -> list:
+def convert_string_list_to_floats(numStr:str) -> list:
 	strList = numStr.split(",")
 	numList = []
 	for s in strList:
 		numList.append(float(s))
 	return numList
-
-"""
-Sets up equations for scipy's fsolve function
-"""
-def systemOfEquations(sol:tuple[float,float], radii, xCoords, yCoords) -> tuple:
-#def equations(sol:list[float,float], *args) -> tuple:
-	xc, yc = sol
-	eqns = []
-	for i in range(0, len(radii)):
-		r = radii[i]
-		x, y = xCoords[i], yCoords[i]
-		eqns.append(xc**2 - 2*x*xc + x**2 + y**2 - 2*y*yc + y**2 - r)
-	return tuple(eqns)
 
 def main():
 	# Parse arguments
@@ -38,14 +25,14 @@ def main():
 
 	try:
 		# Convert given list of radii (string) to tuple of floats and verify their validity
-		radii = convertStringListToFloats(args.r)
+		radii = convert_string_list_to_floats(args.r)
 		for r in radii:
 			if r < 0:
 				raise Exception(f"Found invalid radius: {r}")
 
 		# Convert given list of OP coordinates (strings) to tuples of floats
-		xCoords = convertStringListToFloats(args.x)
-		yCoords = convertStringListToFloats(args.y)
+		xCoords = convert_string_list_to_floats(args.x)
+		yCoords = convert_string_list_to_floats(args.y)
 
 		# Verify that tuples of radii, x-coords, and y-coords are same length
 		if len(radii) != len(xCoords) or len(radii) != len(yCoords):
