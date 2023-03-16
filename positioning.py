@@ -40,23 +40,31 @@ def calculate_roots(num: int, radii: list, xCoords: list, yCoords: list) -> list
 
 def estimate_position(roots: list) -> tuple[float, float]:
 	"""
-	TODO: Add function description
+	Estimates position based on the given list of roots of the intersecting circles. TODO: Once it's complete, explain how the estimate works
+
+	Args:
+		roots (list): A list of roots of the intersecting circles
+
+	Returns:
+		The estimated position as a 2D coordinate represented by a tuple of 2 floats
 	"""
-	coords = set()
+	sum_x, sum_y, total = 0, 0, 0
 	for root in roots:
 		for coord in root:
 			assert len(coord) == 2
 			try:
-				x = float(coord[0])
-				y = float(coord[1])
-				coords.add( (x,y) )
+				sum_x += float(coord[0])
+				sum_y += float(coord[1])
+				total += 1
 			except Exception as e:
 				if str(e) == "Cannot convert complex to float":
 					print(f"Found complex root: {coord}. Safe to disregard.", file=sys.stdout)
 				else:
 					raise e
-	# TODO: Estimate the position by iterating through the remaining coords
-	return (0,0)
+	# TODO: Estimate the position by finding roots that are closest together in value. Averaging is a temporary solution and is very inaccurate
+	avg_x = sum_x / total
+	avg_y = sum_y / total
+	return (avg_x, avg_y)
 
 def pythag(a: tuple, b: tuple) -> float:
 	"""
