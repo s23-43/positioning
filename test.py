@@ -22,14 +22,21 @@ def friis_tests(obj_pos: tuple[float, float], wavelength: float, obj_power: floa
 	Returns
 		TODO: Add return description
 	"""
-	assert len(obj_pos) == 2
+	if len(obj_pos) != 2:
+		raise Exception(f"Object position must be a 2-float tuple. Invalid position: {obj_pos}")
 	xc, yc = obj_pos[0], obj_pos[1]
 
 	NUM = len(op_x_coords)
-	assert NUM == len(op_y_coords)
-	assert NUM == len(op_gains)
+	if NUM != len(op_y_coords) or NUM != len(op_gains):
+		raise Exception(\
+			"Observation points' tuples must match in length.\n" + \
+				f"\tOP x-coords ({len(op_x_coords)}): {op_x_coords}\n" + \
+				f"\tOP y-coords ({len(op_y_coords)}): {op_y_coords}\n" + \
+				f"\tOP gains ({len(op_gains)}): {op_gains}" \
+		)
 
-	assert type(seed) is int or type(seed) is float or seed is None
+	if not (type(seed) is int or type(seed) is float or seed is None):
+		raise Exception(f"Seed for path loss randomization has invalid type {type(seed)}: {seed}")
 
 	# Get exact distances between tracked object and observation points
 	distances = list()
