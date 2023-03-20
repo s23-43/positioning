@@ -23,12 +23,13 @@ def calculate_roots(num: int, radii: tuple, x_coords: tuple, y_coords: tuple) ->
 			roots.append(sympy.solve([funcs[i], funcs[j]], (x,y)))
 	return tuple(roots)
 
-def estimate_position(roots: tuple) -> tuple[float, float]:
+def estimate_position(roots: tuple, show_complex: bool = False) -> tuple[float, float]:
 	"""
 	Estimates position based on the given list of roots of the intersecting circles. TODO: Once it's complete, explain how the estimate works
 
 	Args:
 		roots (list): A list of roots of the intersecting circles
+		show_complex (bool): Optional flag. Roots are sometimes complex and are ignored by the estimation, so this flag determines whether or not to print notifications whenever a complex root is found
 
 	Returns:
 		The estimated position as a 2D coordinate represented by a tuple of 2 floats
@@ -43,7 +44,8 @@ def estimate_position(roots: tuple) -> tuple[float, float]:
 				total += 1
 			except Exception as e:
 				if str(e) == "Cannot convert complex to float":
-					print(f"Found complex root: {coord}. Safe to disregard.", file=sys.stdout)
+					if show_complex:
+						print(f"Found complex root: {coord}. Safe to disregard.", file=sys.stdout)
 				else:
 					raise e
 	# TODO: Estimate the position by finding roots that are closest together in value. Averaging is a temporary solution and is very inaccurate
