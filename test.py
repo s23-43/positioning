@@ -33,10 +33,10 @@ def friis_tests(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_t
 	NUM = len(x_coords_rx)
 	if NUM != len(y_coords_rx) or NUM != len(gains_rx):
 		raise Exception(\
-			"Observation points' tuples must match in length.\n" + \
-				f"\tOP x-coords ({len(x_coords_rx)}): {x_coords_rx}\n" + \
-				f"\tOP y-coords ({len(y_coords_rx)}): {y_coords_rx}\n" + \
-				f"\tOP gains ({len(gains_rx)}): {gains_rx}" \
+			"Observation points' tuples must match in length." + \
+				f"\n\tOP x-coords ({len(x_coords_rx)}): {x_coords_rx}" + \
+				f"\n\tOP y-coords ({len(y_coords_rx)}): {y_coords_rx}" + \
+				f"\n\tOP gains ({len(gains_rx)}): {gains_rx}" \
 		)
 
 	if not (type(seed) is int or type(seed) is float or seed is None):
