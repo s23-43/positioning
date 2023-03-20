@@ -42,6 +42,12 @@ def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 	if not (type(seed) is int or type(seed) is float or seed is None):
 		raise Exception(f"Seed for path loss randomization has invalid type {type(seed)}: {seed}")
 
+	print("Running test with the following setup:")
+	print(f"Object position: {pos_tx}")
+	for i,(x,y,g) in enumerate(zip(x_coords_rx, y_coords_rx, gains_rx)):
+		print(f"OP{i+1} position: {(x,y)} (gain of {g})")
+	print()
+
 	# Calculate received signal powers based on exact distances between the tracked object and observation points to prepare for simulating realistic path loss
 	# If the randomness seed is set, then a random value will be generated and summed to each received path loss to simulate non-ideal conditions
 	powers_rx = list()
@@ -59,15 +65,19 @@ def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 
 	# Estimate the tracked object's position based on calculated distances
 	roots = positioning.calculate_roots(NUM, tuple(calculated_distances), x_coords_rx, y_coords_rx)
+	estimated_position = positioning.estimate_position(roots)
+	error_x = util.approximation_error(exact=pos_tx[0], approx=estimated_position[0]) * 100
+	error_y = util.approximation_error(exact=pos_tx[1], approx=estimated_position[1]) * 100
 	print(f"Exact position:     {pos_tx}")
-	print(f"Estimated position: {positioning.estimate_position(roots)}")
+	print(f"Estimated position: {estimated_position}")
+	print(f"Percent difference: ({error_x}%, {error_y}%)")
 
 def main():
 	x = ( 0.00, 3.00, 10.00 )
 	y = ( 0.00, 8.00,  5.00 )
 	g = ( 0.00, 0.00,  0.00 )
 	try:
-		test(pos_tx=(4,4), wavelength=0.1, p_tx=0, g_tx=0, x_coords_rx=x, y_coords_rx=y, gains_rx=g, seed=2)
+		test(pos_tx=(4,4), wavelength=0.1, p_tx=0, g_tx=0, x_coords_rx=x, y_coords_rx=y, gains_rx=g)
 	except Exception as e:
 		print(e, file=sys.stderr)
 
