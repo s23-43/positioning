@@ -5,7 +5,7 @@ import numpy
 import math
 import sys
 
-def standard_form(power_tx: float, gain_tx: float, gain_rx: float, wavelength: float, distance: float, seed: int | float | None = None) -> float:
+def standard_form(power_tx: float, gain_tx: float, gain_rx: float, wavelength: float, distance: float) -> float:
 	"""
 	Calculates received power using the standard form of the Friis transmission equation
 	Friis transmission equation (standard form):
@@ -17,7 +17,6 @@ def standard_form(power_tx: float, gain_tx: float, gain_rx: float, wavelength: f
 		gain_rx (float): Antenna gain of receiver (dBi)
 		wavelength (float): Wavelength of signal (m)
 		distance (float): Distance between transmitter and receiver (m)
-		seed (int | float | None): Optional value. Seed for randomness (unitless)
 
 	Returns:
 		Signal power of receiver (dBm)
@@ -26,15 +25,7 @@ def standard_form(power_tx: float, gain_tx: float, gain_rx: float, wavelength: f
 		Exception when standard_deviation is not a float
 	"""
 
-	power_rx = power_tx + gain_tx + gain_rx + 20*math.log10(wavelength / (4 * math.pi * distance))
-	sd_type = type(seed)
-
-	if seed is None:
-		return power_rx
-	elif sd_type is int or sd_type is float:
-		return power_rx + numpy.random.normal(0, seed)
-	else:
-		raise Exception(f"Invalid standard devation of type {sd_type}: {seed}")
+	return power_tx + gain_tx + gain_rx + 20*math.log10(wavelength / (4 * math.pi * distance))
 
 def distance_form(power_rx: float, power_tx: float, gain_rx: float, gain_tx: float, wavelength: float) -> float:
 	"""
