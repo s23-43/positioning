@@ -4,7 +4,7 @@ import argparse
 import sympy
 import sys
 
-def convert_string_list_to_floats(numStr: str) -> list:
+def convert_string_list_to_floats(num_str: str) -> tuple[float, ...]:
 	"""
 	Takes a string of numbers formatted with comma-separated numbers and returns a tuple-casted version. For example, if the string is "1,2.2,5,12", then the returned tuple will be (1.0, 2.2, 5.0, 12.0).
 
@@ -14,13 +14,13 @@ def convert_string_list_to_floats(numStr: str) -> list:
 	Returns:
 		A list with each number in the comma-separated list as its own entry in the list
 	"""
-	strList = numStr.split(",")
-	numList = []
-	for s in strList:
-		numList.append(float(s))
-	return numList
+	str_list = num_str.split(",")
+	num_list = list()
+	for s in str_list:
+		num_list.append(float(s))
+	return tuple(num_list)
 
-def calculate_roots(num: int, radii: list, xCoords: list, yCoords: list) -> list:
+def calculate_roots(num: int, radii: tuple, xCoords: tuple, yCoords: tuple) -> tuple:
 	"""
 	TODO: Add function description
 	"""
@@ -36,9 +36,9 @@ def calculate_roots(num: int, radii: list, xCoords: list, yCoords: list) -> list
 	for i in range(0, num):
 		for j in range(i+1, num):
 			roots.append(sympy.solve([funcs[i], funcs[j]], (x,y)))
-	return roots
+	return tuple(roots)
 
-def estimate_position(roots: list) -> tuple[float, float]:
+def estimate_position(roots: tuple) -> tuple[float, float]:
 	"""
 	Estimates position based on the given list of roots of the intersecting circles. TODO: Once it's complete, explain how the estimate works
 

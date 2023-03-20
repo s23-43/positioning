@@ -5,20 +5,40 @@ import numpy
 import math
 import sys
 
-def calculate_power_rx(power_tx: float, gain_tx: float, gain_rx: float, wavelength: float, distance: float) -> float:
+def standard_form(power_tx: float, gain_tx: float, gain_rx: float, wavelength: float, distance: float, seed: int | float | None = None) -> float:
+	"""
+	Calculates received power using the standard form of the Friis transmission equation
+	Friis transmission equation (standard form):
+		Pr[dBm] = Pt[dBm] + Gt[dBi] + Gr[dBi] + 20*log10(λ/(4πd))
+
+	Args:
+		power_tx (float): Signal power of transmitter (dBm)
+		gain_tx (float): Antenna gain of transmitter (dBi)
+		gain_rx (float): Antenna gain of receiver (dBi)
+		wavelength (float): Wavelength of signal (m)
+		distance (float): Distance between transmitter and receiver (m)
+		seed (int | float | None): Optional value. Seed for randomness (unitless)
+
+	Returns:
+		Signal power of receiver (dBm)
+
+	Raises:
+		Exception when standard_deviation is not a float
+	"""
+
 	power_rx = power_tx + gain_tx + gain_rx + 20*math.log10(wavelength / (4 * math.pi * distance))
-	return power_rx
+	sd_type = type(seed)
 
-def calculate_power_rx_log_normal(power_tx: float, gain_tx: float, gain_rx: float, wavelength: float, distance: float, standard_deviation) -> float:
-	rand = numpy.random.normal(0, standard_deviation)
-	power_rx = calculate_power_rx(power_tx, gain_tx, gain_rx, wavelength, distance)
-	return power_rx + rand
+	if seed is None:
+		return power_rx
+	elif sd_type is int or sd_type is float:
+		return power_rx + numpy.random.normal(0, seed)
+	else:
+		raise Exception(f"Invalid standard devation of type {sd_type}: {seed}")
 
-def calculate_distance(power_rx: float, power_tx: float, gain_rx: float, gain_tx: float, wavelength: float) -> float:
+def distance_form(power_rx: float, power_tx: float, gain_rx: float, gain_tx: float, wavelength: float) -> float:
 	"""
 	Calculates the distance between a receiver and a transmitter using the decibel form of the Friis transmission equation
-	Friis transmission equation (conventional form):
-		Pr[dBm] = Pt[dBm] + Gt[dBi] + Gr[dBi] + 20*log10(λ/(4πd))
 	Friis transmission equation (distance-isolated form):
 		d = λ / (4π * 10^( ((Pr[dBm] - Pt[dBm] - Gt[dBi] - Gr[dBi]) / 20) )
 
@@ -45,7 +65,7 @@ def main():
 	parser.add_argument("-wl", "--power-rx", type=float, required=True, help="Signal wavelength. Output distance will be the same distance units as this")
 	args = parser.parse_args()
 
-	distance: float = calculate_distance(args.pr, args.pt, args.gr, args.gt, args.wl)
+	distance: float = distance_form(args.pr, args.pt, args.gr, args.gt, args.wl)
 	print(distance, file=sys.stdout) # output radius in same units as wavelength
 
 if __name__ == "__main__":
