@@ -6,7 +6,7 @@ import positioning
 import numpy
 import util
 
-def friis_tests(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: float, x_coords_rx: tuple[float, ...], y_coords_rx: tuple[float, ...], gains_rx: tuple[float, ...], seed: int | float | None = None) -> None:
+def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: float, x_coords_rx: tuple[float, ...], y_coords_rx: tuple[float, ...], gains_rx: tuple[float, ...], seed: int | float | None = None) -> None:
 	"""
 	TODO: Add function description
 
@@ -62,26 +62,12 @@ def friis_tests(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_t
 	print(f"Exact position:     {pos_tx}")
 	print(f"Estimated position: {positioning.estimate_position(roots)}")
 
-def pos_tests() -> None:
-	"""
-	TODO: Add function description
-	"""
-	radii    = ( 5.66, 4.12,  6.08, 4.24, 4.24 )
-	x_coords = ( 0.00, 3.00, 10.00, 7.00, 1.00 )
-	y_coords = ( 0.00, 8.00,  5.00, 7.00, 1.00 )
-	assert len(radii) == len(x_coords)
-	assert len(radii) == len(y_coords)
-	expectedPosition = (4,4)
-	roots = positioning.calculate_roots(len(radii), radii, x_coords, y_coords)
-	print(positioning.estimate_position(roots))
-
 def main():
 	x = ( 0.00, 3.00, 10.00 )
 	y = ( 0.00, 8.00,  5.00 )
 	g = ( 0.00, 0.00,  0.00 )
 	try:
-		friis_tests(pos_tx=(4,4), wavelength=0.1, p_tx=0, g_tx=0, x_coords_rx=x, y_coords_rx=y, gains_rx=g, seed=2)
-		#pos_tests()
+		test(pos_tx=(4,4), wavelength=0.1, p_tx=0, g_tx=0, x_coords_rx=x, y_coords_rx=y, gains_rx=g, seed=2)
 	except Exception as e:
 		print(e, file=sys.stderr)
 
