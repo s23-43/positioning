@@ -42,25 +42,22 @@ def friis_tests(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_t
 	if not (type(seed) is int or type(seed) is float or seed is None):
 		raise Exception(f"Seed for path loss randomization has invalid type {type(seed)}: {seed}")
 
-	# Get exact distances between tracked object and observation points
-	distances = list()
-	for x, y in zip(x_coords_rx, y_coords_rx):
-		distances.append(util.pythagorean_theorem((x,y), (xc, yc)))
-
-	# Get received signal powers
+	# Calculate received signal powers based on exact distances between the tracked object and observation points to prepare for simulating realistic path loss
+	# If the randomness seed is set, then a random value will be generated and summed to each received path loss to simulate non-ideal conditions
 	powers_rx = list()
-	for i in range(len(distances)):
-		p_rx = friis.standard_form(p_tx, g_tx, gains_rx[i], wavelength, distances[i])
+	for x,y,g in zip(x_coords_rx, y_coords_rx, gains_rx):
+		dist = util.pythagorean_theorem((x,y), (xc, yc))
+		p_rx = friis.standard_form(p_tx, g_tx, g, wavelength, dist)
 		if seed is not None:
 			p_rx += numpy.random.normal(0, seed)
 		powers_rx.append(p_rx)
 
-	# Get estimated distances
+	# Calculate distances between the tracked object and observation points based on the simulated path losses
 	calculated_distances = list()
 	for i in range(len(powers_rx)):
 		calculated_distances.append(friis.distance_form(powers_rx[i], p_tx, gains_rx[i], g_tx, wavelength))
 
-	# Estimate position based on estimated distances
+	# Estimate the tracked object's position based on calculated distances
 	roots = positioning.calculate_roots(NUM, tuple(calculated_distances), x_coords_rx, y_coords_rx)
 	print(f"Exact position:     {pos_tx}")
 	print(f"Estimated position: {positioning.estimate_position(roots)}")
