@@ -43,9 +43,9 @@ def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 		raise Exception(f"Seed for path loss randomization has invalid type {type(seed)}: {seed}")
 
 	print("Running test with the following setup:")
-	print(f"Object position: {pos_tx}")
+	print(f"Tracked object at {pos_tx}")
 	for i,(x,y,g) in enumerate(zip(x_coords_rx, y_coords_rx, gains_rx)):
-		print(f"OP{i+1} position: {(x,y)} (gain of {g})")
+		print(f"OP{i+1} at {(x,y)} with a gain of {g}")
 	print()
 
 	# Calculate received signal powers based on exact distances between the tracked object and observation points to prepare for simulating realistic path loss
