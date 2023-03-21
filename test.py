@@ -20,7 +20,7 @@ def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 		gains_rx (tuple[float, ...]): List of receivers' antenna gains ([dBi, ...])
 		seed (int | float | None): Optional parameter. Seed value for path loss randomness to simulate non-ideal conditions
 
-	Returns
+	Returns:
 		TODO: Add return description
 
 	Raises:
@@ -43,10 +43,9 @@ def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 		raise Exception(f"Seed for path loss randomization has invalid type {type(seed)}: {seed}")
 
 	print("Running test with the following setup:")
-	print(f"Tracked object at {pos_tx}")
+	print(f"- Signal of wavelength {wavelength}m transmitting from ({xc}m, {yc}m) with power of {p_tx}dBm and gain of {g_tx}dBi")
 	for i,(x,y,g) in enumerate(zip(x_coords_rx, y_coords_rx, gains_rx)):
-		print(f"OP{i+1} at {(x,y)} with a gain of {g}")
-	print()
+		print(f"- OP{i+1} receiving signal at {(x,y)} with gain of {g}dBi")
 
 	# Calculate received signal powers based on exact distances between the tracked object and observation points to prepare for simulating realistic path loss
 	# If the randomness seed is set, then a random value will be generated and summed to each received path loss to simulate non-ideal conditions
@@ -60,17 +59,23 @@ def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 
 	# Calculate distances between the tracked object and observation points based on the simulated path losses
 	calculated_distances = list()
-	for i in range(len(powers_rx)):
-		calculated_distances.append(friis.distance_form(powers_rx[i], p_tx, gains_rx[i], g_tx, wavelength))
+	for p,g in zip(powers_rx, gains_rx):
+		calculated_distances.append(friis.distance_form(p, p_tx, g, g_tx, wavelength))
 
 	# Estimate the tracked object's position based on calculated distances
 	roots = positioning.calculate_roots(NUM, tuple(calculated_distances), x_coords_rx, y_coords_rx)
-	estimated_position = positioning.estimate_position(roots)
-	error_x = util.approximation_error(exact=pos_tx[0], approx=estimated_position[0]) * 100
-	error_y = util.approximation_error(exact=pos_tx[1], approx=estimated_position[1]) * 100
-	print(f"Exact position:     {pos_tx}")
-	print(f"Estimated position: {estimated_position}")
-	print(f"Percent difference: ({error_x}%, {error_y}%)")
+	print(f"Exact position:     ({round(xc, 3)}m, {round(yc, 3)}m)")
+	estimated_pos = positioning.estimate_position(roots)
+	xp, yp = estimated_pos
+	print(f"Estimated position: ({round(xp, 3)}m, {round(yp, 3)}m)")
+	xe = util.approximation_error(exact=xc, approx=xp) * 100
+	ye = util.approximation_error(exact=yc, approx=yp) * 100
+	print(f"Percent difference: ({round(xe, 3)}%, {round(ye, 3)}%)")
+	dx = abs(xc - xp)
+	dy = abs(yc - yp)
+	print(f"Delta values:       ({round(dx, 3)}m, {round(dy, 3)}m)")
+	dist = util.pythagorean_theorem((xc,yc),(xp,yp))
+	print(f"Distance apart:     {round(dist, 3)}m")
 
 def main():
 	x = ( 0.00, 3.00, 10.00 )
