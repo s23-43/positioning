@@ -26,10 +26,10 @@ def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 		Exception: If tuples representing observation points' positions and gains do not have matching lengths
 		Exception: If the seed for path loss randomization is not a numeric type or `None` type
 	"""
+	# Validate parameters
 	if len(pos_tx) != 2:
 		raise Exception(f"Object position must be a 2-float tuple. Invalid position: {pos_tx}")
 	xc, yc = pos_tx[0], pos_tx[1]
-
 	NUM = len(x_coords_rx)
 	if NUM != len(y_coords_rx) or NUM != len(gains_rx):
 		raise Exception(\
@@ -38,10 +38,10 @@ def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 				f"\n\tOP y-coords ({len(y_coords_rx)}): {y_coords_rx}" + \
 				f"\n\tOP gains ({len(gains_rx)}): {gains_rx}" \
 		)
-
 	if not (type(seed) is int or type(seed) is float or seed is None):
 		raise Exception(f"Seed for path loss randomization has invalid type {type(seed)}: {seed}")
 
+	# Output test details
 	print("Running test with the following setup:")
 	print(f"- Signal of wavelength {wavelength}m transmitting from ({xc}m, {yc}m) with power of {p_tx}dBm and gain of {g_tx}dBi")
 	for i,(x,y,g) in enumerate(zip(x_coords_rx, y_coords_rx, gains_rx)):
