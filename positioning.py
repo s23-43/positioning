@@ -28,8 +28,8 @@ def estimate_position(roots: tuple, show_complex: bool = False) -> tuple[float, 
 	Estimates position based on the given list of roots of the intersecting circles. TODO: Once it's complete, explain how the estimate works
 
 	Args:
-		roots (list): A list of roots of the intersecting circles
-		show_complex (bool): Optional flag. Roots are sometimes complex and are ignored by the estimation, so this flag determines whether or not to print notifications whenever a complex root is found
+		roots: A list of roots of the intersecting circles
+		show_complex (optional): Roots are sometimes complex and are ignored by the estimation, so this flag determines whether or not to print notifications whenever a complex root is found
 
 	Returns:
 		The estimated position as a 2D coordinate represented by a tuple of 2 floats

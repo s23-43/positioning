@@ -11,11 +11,11 @@ def standard_form(power_tx: float, gain_tx: float, gain_rx: float, wavelength: f
 		Pr[dBm] = Pt[dBm] + Gt[dBi] + Gr[dBi] + 20*log10(λ/(4πd))
 
 	Args:
-		power_tx (float): Signal power of transmitter (dBm)
-		gain_tx (float): Antenna gain of transmitter (dBi)
-		gain_rx (float): Antenna gain of receiver (dBi)
-		wavelength (float): Wavelength of signal (m)
-		distance (float): Distance between transmitter and receiver (m)
+		power_tx: Signal power of transmitter (dBm)
+		gain_tx: Antenna gain of transmitter (dBi)
+		gain_rx: Antenna gain of receiver (dBi)
+		wavelength: Wavelength of signal (m)
+		distance: Distance between transmitter and receiver (m)
 
 	Returns:
 		Signal power of receiver (dBm)
@@ -33,11 +33,11 @@ def distance_form(power_rx: float, power_tx: float, gain_rx: float, gain_tx: flo
 		d = λ / (4π * 10^( ((Pr[dBm] - Pt[dBm] - Gt[dBi] - Gr[dBi]) / 20) )
 
 	Args:
-		power_rx (float): The signal power of the receiver (dBm)
-		power_tx (float): The signal power of the transmitter (dBm)
-		gain_rx (float): The antenna gain of the receiver (dBi)
-		gain_tx (float): The antenna gain of the transmitter (dBi)
-		wavelength (float): The wavelength of the signal
+		power_rx: The signal power of the receiver (dBm)
+		power_tx: The signal power of the transmitter (dBm)
+		gain_rx: The antenna gain of the receiver (dBi)
+		gain_tx: The antenna gain of the transmitter (dBi)
+		wavelength: The wavelength of the signal
 
 	Returns:
 		The distance between the receiver and transmitter

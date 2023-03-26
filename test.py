@@ -12,14 +12,14 @@ def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 	Runs a test that compares a tracked object's actual position with the position estimated by the positioning algorithm based on path losses. Randomess can optionally be added to path losses to simulate non-ideal conditions.
 
 	Args:
-		pos_tx (tuple[float, float]): Position of transmitter ([m, m])
-		wavelength (float): Wavelength of transmitted signal (m)
-		p_tx (float): Signal power of transmitter (dBm)
-		g_tx (float): Antenna gain of tracked object (dBi)
-		x_coords_rx (tuple[float, ...]): Receivers' x-coordinate values in 2D plane ([m, ...])
-		y_coords_rx (tuple[float, ...]): Receivers' y-coordinate values in 2D plane ([m, ...])
-		gains_rx (tuple[float, ...]): List of receivers' antenna gains ([dBi, ...])
-		seed (int | float | None): Optional parameter. Seed value for path loss randomness to simulate non-ideal conditions
+		pos_tx: Position of transmitter ([m, m])
+		wavelength: Wavelength of transmitted signal (m)
+		p_tx: Signal power of transmitter (dBm)
+		g_tx: Antenna gain of tracked object (dBi)
+		x_coords_rx: Receivers' x-coordinate values in 2D plane ([m, ...])
+		y_coords_rx: Receivers' y-coordinate values in 2D plane ([m, ...])
+		gains_rx: List of receivers' antenna gains ([dBi, ...])
+		seed (optional): Seed value for path loss randomness to simulate non-ideal conditions
 
 	Raises:
 		Exception: If tuple representing the tracked object's position does not have length of 2
