@@ -9,7 +9,7 @@ import util
 
 def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: float, x_coords_rx: tuple[float, ...], y_coords_rx: tuple[float, ...], gains_rx: tuple[float, ...], seed: int | float | None = None) -> None:
 	"""
-	TODO: Add function description
+	Runs a test that compares a tracked object's actual position with the position estimated by the positioning algorithm based on path losses. Randomess can optionally be added to path losses to simulate non-ideal conditions.
 
 	Args:
 		pos_tx (tuple[float, float]): Position of transmitter ([m, m])
