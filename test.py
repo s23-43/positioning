@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 import friis
-import sys
-import positioning
 import numpy
+import positioning
+import sys
+import time
 import util
 
 def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: float, x_coords_rx: tuple[float, ...], y_coords_rx: tuple[float, ...], gains_rx: tuple[float, ...], seed: int | float | None = None) -> None:
@@ -62,20 +63,29 @@ def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 	for p,g in zip(powers_rx, gains_rx):
 		calculated_distances.append(friis.distance_form(p, p_tx, g, g_tx, wavelength))
 
-	# Estimate the tracked object's position based on calculated distances
-	roots = positioning.calculate_roots(NUM, tuple(calculated_distances), x_coords_rx, y_coords_rx)
-	print(f"Exact position:     ({round(xc, 3)}m, {round(yc, 3)}m)")
+	# Estimate the tracked object's position based on calculated distances. There should be as little overhead as possible between start_time and end_time so as not
+	# to misrepresent/inflate the amount of time it takes to estimate position
+	calculated_distances_tuple = tuple(calculated_distances)
+	start_time = time.time()
+	roots = positioning.calculate_roots(NUM, calculated_distances_tuple, x_coords_rx, y_coords_rx)
 	estimated_pos = positioning.estimate_position(roots)
-	xp, yp = estimated_pos
-	print(f"Estimated position: ({round(xp, 3)}m, {round(yp, 3)}m)")
-	xe = util.approximation_error(exact=xc, approx=xp) * 100
-	ye = util.approximation_error(exact=yc, approx=yp) * 100
-	print(f"Percent difference: ({round(xe, 3)}%, {round(ye, 3)}%)")
-	dx = abs(xc - xp)
-	dy = abs(yc - yp)
-	print(f"Delta values:       ({round(dx, 3)}m, {round(dy, 3)}m)")
-	dist = util.pythagorean_theorem((xc,yc),(xp,yp))
-	print(f"Distance apart:     {round(dist, 3)}m")
+	end_time = time.time()
+	x_est, y_est = estimated_pos
+
+	# Calculate comparisons between actual and estimated values
+	xe = util.approximation_error(exact=xc, approx=x_est) * 100
+	ye = util.approximation_error(exact=yc, approx=y_est) * 100
+	dx = abs(xc - x_est)
+	dy = abs(yc - y_est)
+	dist = util.pythagorean_theorem((xc,yc),(x_est,y_est))
+
+	# Output results
+	print(f"Exact position:          ({round(xc, 3)}m, {round(yc, 3)}m)")
+	print(f"Estimated position:      ({round(x_est, 3)}m, {round(y_est, 3)}m)")
+	print(f"Estimation elapsed time: {round(end_time - start_time, 3)}sec")
+	print(f"Percent difference:      ({round(xe, 3)}%, {round(ye, 3)}%)")
+	print(f"Delta values:            ({round(dx, 3)}m, {round(dy, 3)}m)")
+	print(f"Distance apart:          {round(dist, 3)}m")
 
 def main():
 	x = ( 0.00, 3.00, 10.00 )
