@@ -21,11 +21,10 @@ def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 		gains_rx (tuple[float, ...]): List of receivers' antenna gains ([dBi, ...])
 		seed (int | float | None): Optional parameter. Seed value for path loss randomness to simulate non-ideal conditions
 
-	Returns:
-		TODO: Add return description
-
 	Raises:
-		TODO: Add exception descriptions
+		Exception: If tuple representing the tracked object's position does not have length of 2
+		Exception: If tuples representing observation points' positions and gains do not have matching lengths
+		Exception: If the seed for path loss randomization is not a numeric type or `None` type
 	"""
 	if len(pos_tx) != 2:
 		raise Exception(f"Object position must be a 2-float tuple. Invalid position: {pos_tx}")
