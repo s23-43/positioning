@@ -29,7 +29,7 @@ def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 	# Validate parameters
 	if len(pos_tx) != 2:
 		raise Exception(f"Object position must be a 2-float tuple. Invalid position: {pos_tx}")
-	xc, yc = pos_tx[0], pos_tx[1]
+	x_real, y_real = pos_tx[0], pos_tx[1]
 	NUM = len(x_coords_rx)
 	if NUM != len(y_coords_rx) or NUM != len(gains_rx):
 		raise Exception(\
@@ -43,7 +43,7 @@ def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 
 	# Output test details
 	print("Running test with the following setup:")
-	print(f"- Signal of wavelength {wavelength}m transmitting from ({xc}m, {yc}m) with power of {p_tx}dBm and gain of {g_tx}dBi")
+	print(f"- Signal of wavelength {wavelength}m transmitting from ({x_real}m, {y_real}m) with power of {p_tx}dBm and gain of {g_tx}dBi")
 	for i,(x,y,g) in enumerate(zip(x_coords_rx, y_coords_rx, gains_rx)):
 		print(f"- OP{i+1} receiving signal at {(x,y)} with gain of {g}dBi")
 
@@ -51,7 +51,7 @@ def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 	# If the randomness seed is set, then a random value will be generated and summed to each received path loss to simulate non-ideal conditions
 	powers_rx = list()
 	for x,y,g in zip(x_coords_rx, y_coords_rx, gains_rx):
-		dist = util.pythagorean_theorem((x,y), (xc, yc))
+		dist = util.pythagorean_theorem((x,y), (x_real, y_real))
 		p_rx = friis.standard_form(p_tx, g_tx, g, wavelength, dist)
 		if seed is not None:
 			p_rx += numpy.random.normal(0, seed)
@@ -69,21 +69,22 @@ def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 	roots = positioning.calculate_roots(NUM, calculated_distances_tuple, x_coords_rx, y_coords_rx)
 	estimated_pos = positioning.estimate_position(roots)
 	end_time = time.time()
-	x_est, y_est = estimated_pos
+	x_estm, y_estm = estimated_pos
 
 	# Calculate comparisons between actual and estimated values
-	xe = util.approximation_error(exact=xc, approx=x_est) * 100
-	ye = util.approximation_error(exact=yc, approx=y_est) * 100
-	dx = abs(xc - x_est)
-	dy = abs(yc - y_est)
-	dist = util.pythagorean_theorem((xc,yc),(x_est,y_est))
+	x_erro = util.approximation_error(exact=x_real, approx=x_estm) * 100
+	y_erro = util.approximation_error(exact=y_real, approx=y_estm) * 100
+	x_diff = abs(x_real - x_estm)
+	y_diff = abs(y_real - y_estm)
+	dist = util.pythagorean_theorem((x_real,y_real),(x_estm,y_estm))
 
 	# Output results
-	print(f"Exact position:          ({round(xc, 3)}m, {round(yc, 3)}m)")
-	print(f"Estimated position:      ({round(x_est, 3)}m, {round(y_est, 3)}m)")
+	ROUND_AMT: int = 3
+	print(f"Exact position:          ({round(x_real, ROUND_AMT)}m, {round(y_real, ROUND_AMT)}m)")
+	print(f"Estimated position:      ({round(x_estm, ROUND_AMT)}m, {round(y_estm, ROUND_AMT)}m)")
 	print(f"Estimation elapsed time: {round(end_time - start_time, 3)}sec")
-	print(f"Percent difference:      ({round(xe, 3)}%, {round(ye, 3)}%)")
-	print(f"Delta values:            ({round(dx, 3)}m, {round(dy, 3)}m)")
+	print(f"Percent difference:      ({round(x_erro, ROUND_AMT)}%, {round(y_erro, ROUND_AMT)}%)")
+	print(f"Delta values:            ({round(x_diff, ROUND_AMT)}m, {round(y_diff, ROUND_AMT)}m)")
 	print(f"Distance apart:          {round(dist, 3)}m")
 
 def main():
