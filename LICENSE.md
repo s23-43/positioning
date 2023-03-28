@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2023 Experimental 5G Positioning System
+Copyright (c) 2023 Experimental Cellular Positioning System
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
