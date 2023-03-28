@@ -86,7 +86,7 @@ def test(pos_tx: Tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 	print(f"Estimation elapsed time: {round(end_time - start_time, 3)}sec")
 	print(f"Percent difference:      ({round(x_erro, ROUND_AMT)}%, {round(y_erro, ROUND_AMT)}%)")
 	print(f"Delta values:            ({round(x_diff, ROUND_AMT)}m, {round(y_diff, ROUND_AMT)}m)")
-	print(f"Distance apart:          {round(dist, 3)}m")
+	print(f"Distance apart:          {round(dist, ROUND_AMT)}m")
 
 def main():
 	x = ( 0.00, 3.00, 10.00 )
