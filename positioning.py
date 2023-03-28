@@ -4,8 +4,9 @@ import argparse
 import sympy
 import sys
 import util
+from typing import Tuple
 
-def calculate_roots(num: int, radii: tuple, x_coords: tuple, y_coords: tuple) -> tuple:
+def calculate_roots(num: int, radii: Tuple[float, ...], x_coords: Tuple[float, ...], y_coords: Tuple[float, ...]) -> tuple:
 	"""
 	TODO: Add function description
 	"""
@@ -23,7 +24,7 @@ def calculate_roots(num: int, radii: tuple, x_coords: tuple, y_coords: tuple) ->
 			roots.append(sympy.solve([funcs[i], funcs[j]], (x,y)))
 	return tuple(roots)
 
-def estimate_position(roots: tuple, show_complex: bool = False) -> tuple[float, float]:
+def estimate_position(roots: tuple, show_complex: bool = False) -> Tuple[float, ...]:
 	"""
 	Estimates position based on the given list of roots of the intersecting circles. TODO: Once it's complete, explain how the estimate works
 

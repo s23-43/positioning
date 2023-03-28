@@ -6,8 +6,9 @@ import positioning
 import sys
 import time
 import util
+from typing import Tuple, Optional
 
-def test(pos_tx: tuple[float, float], wavelength: float, p_tx: float, g_tx: float, x_coords_rx: tuple[float, ...], y_coords_rx: tuple[float, ...], gains_rx: tuple[float, ...], seed: int | float | None = None) -> None:
+def test(pos_tx: Tuple[float, float], wavelength: float, p_tx: float, g_tx: float, x_coords_rx: Tuple[float, ...], y_coords_rx: Tuple[float, ...], gains_rx: Tuple[float, ...], seed: Optional[float] = None) -> None:
 	"""
 	Runs a test that compares a tracked object's actual position with the position estimated by the positioning algorithm based on path losses. Randomess can optionally be added to path losses to simulate non-ideal conditions.
 
@@ -92,7 +93,7 @@ def main():
 	y = ( 0.00, 8.00,  5.00 )
 	g = ( 0.00, 0.00,  0.00 )
 	try:
-		test(pos_tx=(4,4), wavelength=0.1, p_tx=0, g_tx=0, x_coords_rx=x, y_coords_rx=y, gains_rx=g)
+		test(pos_tx=(4,4), wavelength=0.1, p_tx=0, g_tx=0, x_coords_rx=x, y_coords_rx=y, gains_rx=g, seed=4)
 	except Exception as e:
 		print(e, file=sys.stderr)
 

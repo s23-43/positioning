@@ -1,6 +1,7 @@
 import math
+from typing import Tuple
 
-def pythagorean_theorem(a: tuple[float, float], b: tuple[float, float]) -> float:
+def pythagorean_theorem(a: Tuple[float, float], b: Tuple[float, float]) -> float:
 	"""
 	Calculates the distance between two coordinates in a 2D space using the Pythagorean theorem
 
@@ -30,7 +31,7 @@ def approximation_error(approx: float = 0, exact: float = 1) -> float:
 	diff = (approx - exact)
 	return abs(diff / exact)
 
-def convert_string_list_to_floats(num_str: str) -> tuple[float, ...]:
+def convert_string_list_to_floats(num_str: str) -> tuple:
 	"""
 	Takes a string of numbers formatted with comma-separated numbers and returns a tuple-casted version. For example, if the string is "1,2.2,5,12", then the returned tuple will be (1.0, 2.2, 5.0, 12.0).
 
