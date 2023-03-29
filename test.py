@@ -7,6 +7,7 @@ import sys
 import time
 import util
 from typing import Tuple, Optional
+from matplotlib import pyplot as plt
 
 def test(pos_tx: Tuple[float, float], wavelength: float, p_tx: float, g_tx: float, x_coords_rx: Tuple[float, ...], y_coords_rx: Tuple[float, ...], gains_rx: Tuple[float, ...], seed: Optional[float] = None) -> None:
 	"""
@@ -88,12 +89,26 @@ def test(pos_tx: Tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 	print(f"Delta values:            ({round(x_diff, ROUND_AMT)}m, {round(y_diff, ROUND_AMT)}m)")
 	print(f"Distance apart:          {round(dist, ROUND_AMT)}m")
 
+	# Visualize positions
+	real = round(x_real, ROUND_AMT), round(y_real, ROUND_AMT)
+	estm = round(x_estm, ROUND_AMT), round(y_estm, ROUND_AMT)
+	_, ax = plt.subplots()
+	plt.plot(x_real, y_real, '*')
+	ax.annotate( f"actual {real}", real )
+	plt.plot(x_estm, y_estm, 'o')
+	ax.annotate( f"estimate {estm}", estm )
+	for i,(x,y) in enumerate(zip(x_coords_rx, y_coords_rx)):
+		op = round(x, ROUND_AMT), round(y, ROUND_AMT)
+		plt.plot(x, y, '.')
+		ax.annotate( f"OP{i+1}{op}", op )
+	plt.show(block=True)
+
 def main():
 	x = ( 0.00, 3.00, 10.00 )
 	y = ( 0.00, 8.00,  5.00 )
 	g = ( 0.00, 0.00,  0.00 )
 	try:
-		test(pos_tx=(4,4), wavelength=0.1, p_tx=0, g_tx=0, x_coords_rx=x, y_coords_rx=y, gains_rx=g, seed=4)
+		test(pos_tx=(4,4), wavelength=0.1, p_tx=0, g_tx=0, x_coords_rx=x, y_coords_rx=y, gains_rx=g, seed=0.5)
 	except Exception as e:
 		print(e, file=sys.stderr)
 
