@@ -53,7 +53,7 @@ def test(pos_tx: Tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 	# If the randomness seed is set, then a random value will be generated and summed to each received path loss to simulate non-ideal conditions
 	powers_rx = list()
 	for x,y,g in zip(x_coords_rx, y_coords_rx, gains_rx):
-		dist = util.pythagorean_theorem((x,y), (x_real, y_real))
+		dist = util.distance_between((x,y), (x_real, y_real))
 		p_rx = friis.standard_form(p_tx, g_tx, g, wavelength, dist)
 		if seed is not None:
 			p_rx += numpy.random.normal(0, seed)
@@ -78,7 +78,7 @@ def test(pos_tx: Tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 	y_erro = util.approximation_error(exact=y_real, approx=y_estm) * 100
 	x_diff = abs(x_real - x_estm)
 	y_diff = abs(y_real - y_estm)
-	dist = util.pythagorean_theorem((x_real,y_real),(x_estm,y_estm))
+	dist = util.distance_between((x_real,y_real),(x_estm,y_estm))
 
 	# Output results
 	ROUND_AMT: int = 3

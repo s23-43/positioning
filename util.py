@@ -1,7 +1,7 @@
 import math
 from typing import Tuple
 
-def pythagorean_theorem(a: Tuple[float, float], b: Tuple[float, float]) -> float:
+def distance_between(a: Tuple[float, float], b: Tuple[float, float]) -> float:
 	"""
 	Calculates the distance between two coordinates in a 2D space using the Pythagorean theorem
 
