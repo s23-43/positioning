@@ -104,9 +104,12 @@ def test(pos_tx: Tuple[float, float], wavelength: float, p_tx: float, g_tx: floa
 	plt.show(block=True)
 
 def main():
-	x = ( 0.00, 3.00, 10.00 )
-	y = ( 0.00, 8.00,  5.00 )
-	g = ( 0.00, 0.00,  0.00 )
+#	x = ( 0.00, 3.00, 10.00 )
+#	y = ( 0.00, 8.00,  5.00 )
+#	g = ( 0.00, 0.00,  0.00 )
+	x = ( 0.00, 0.00,  0.00, 5.00,  5.00, 10.00, 10.00, 10.00 )
+	y = ( 0.00, 5.00, 10.00, 0.00, 10.00,  0.00,  5.00, 10.00 )
+	g = ( 0.00, 0.00,  0.00, 0.00,  0.00,  0.00,  0.00,  0.00 )
 	try:
 		test(pos_tx=(4,4), wavelength=0.1, p_tx=0, g_tx=0, x_coords_rx=x, y_coords_rx=y, gains_rx=g, seed=0.5)
 	except Exception as e:

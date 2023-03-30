@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import scipy.stats as stats
 import sympy
 import sys
 import util
@@ -21,7 +22,7 @@ def calculate_roots(num: int, radii: Tuple[float, ...], x_coords: Tuple[float, .
 	roots = list()
 	for i in range(0, num):
 		for j in range(i+1, num):
-			roots.append(sympy.solve([funcs[i], funcs[j]], (x,y)))
+			roots.append(sympy.solve( [funcs[i], funcs[j]], (x,y) ))
 	return tuple(roots)
 
 def estimate_position(roots: tuple, show_complex: bool = False) -> Tuple[float, ...]:
@@ -35,13 +36,15 @@ def estimate_position(roots: tuple, show_complex: bool = False) -> Tuple[float, 
 	Returns:
 		The estimated position as a 2D coordinate represented by a tuple of 2 floats
 	"""
-	sum_x, sum_y, total = 0, 0, 0
+	x = list()
+	y = list()
+	total = 0
 	for root in roots:
 		for coord in root:
 			assert len(coord) == 2
 			try:
-				sum_x += float(coord[0])
-				sum_y += float(coord[1])
+				x.append( float(coord[0]) )
+				y.append( float(coord[1]) )
 				total += 1
 			except Exception as e:
 				if str(e) == "Cannot convert complex to float":
@@ -49,10 +52,7 @@ def estimate_position(roots: tuple, show_complex: bool = False) -> Tuple[float, 
 						print(f"Found complex root: {coord}. Safe to disregard.", file=sys.stdout)
 				else:
 					raise e
-	# TODO: Estimate the position by finding roots that are closest together in value. Averaging is a temporary solution and is very inaccurate
-	avg_x = sum_x / total
-	avg_y = sum_y / total
-	return (avg_x, avg_y)
+	return ( stats.trim_mean(x, 0.25), stats.trim_mean(y, 0.25) )
 
 def main():
 	# Parse arguments
