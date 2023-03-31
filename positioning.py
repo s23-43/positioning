@@ -5,9 +5,9 @@ import scipy.stats as stats
 import sympy
 import sys
 import util
-from typing import Tuple
+from typing import List, Tuple
 
-def calculate_roots(num: int, radii: Tuple[float, ...], x_coords: Tuple[float, ...], y_coords: Tuple[float, ...]) -> tuple:
+def calculate_roots(num: int, radii: List[float], x_coords: List[float], y_coords: List[float]) -> list:
 	"""
 	TODO: Add function description
 	"""
@@ -23,9 +23,9 @@ def calculate_roots(num: int, radii: Tuple[float, ...], x_coords: Tuple[float, .
 	for i in range(0, num):
 		for j in range(i+1, num):
 			roots.append(sympy.solve( [funcs[i], funcs[j]], (x,y) ))
-	return tuple(roots)
+	return roots
 
-def estimate_position(roots: tuple, show_complex: bool = False) -> Tuple[float, ...]:
+def estimate_position_by_roots(roots: list, show_complex: bool = False) -> Tuple[float, float]:
 	"""
 	Estimates position based on the given list of roots of the intersecting circles. TODO: Once it's complete, explain how the estimate works
 
@@ -80,7 +80,7 @@ def main():
 
 		# Estimate and print position
 		roots = calculate_roots(numOPs, radii, xCoords, yCoords)
-		print(estimate_position(roots))
+		print(estimate_position_by_roots(roots))
 	except Exception as e:
 		print(e, file=sys.stderr)
 

@@ -6,99 +6,95 @@ import positioning
 import sys
 import time
 import util
-from typing import Tuple, Optional
+from typing import List, Tuple
 from matplotlib import pyplot as plt
 
-def test(pos_tx: Tuple[float, float], wavelength: float, p_tx: float, g_tx: float, x_coords_rx: Tuple[float, ...], y_coords_rx: Tuple[float, ...], gains_rx: Tuple[float, ...], seed: Optional[float] = None) -> None:
-	"""
-	Runs a test that compares a tracked object's actual position with the position estimated by the positioning algorithm based on path losses. Randomess can optionally be added to path losses to simulate non-ideal conditions.
+class Receivers:
+	def __init__(self, x_coords: List[float], y_coords: List[float], gains: List[float]):
+		NUM = len(x_coords)
+		if NUM != len(y_coords) or NUM != len(gains):
+			raise Exception( \
+				"Receivers' parameters must match in length:" + \
+					f"\n\tx-coordinates ({len(x_coords)}): {x_coords}" + \
+					f"\n\ty-coordinates ({len(y_coords)}): {y_coords}" + \
+					f"\n\tgain values ({len(gains)}): {gains}" \
+			)
+		self.num = NUM
+		self.x_coords = x_coords
+		self.y_coords = y_coords
+		self.gains = gains
 
-	Args:
-		pos_tx: Position of transmitter ([m, m])
-		wavelength: Wavelength of transmitted signal (m)
-		p_tx: Signal power of transmitter (dBm)
-		g_tx: Antenna gain of tracked object (dBi)
-		x_coords_rx: Receivers' x-coordinate values in 2D plane ([m, ...])
-		y_coords_rx: Receivers' y-coordinate values in 2D plane ([m, ...])
-		gains_rx: List of receivers' antenna gains ([dBi, ...])
-		seed (optional): Seed value for path loss randomness to simulate non-ideal conditions
+class Transmitter:
+	def __init__(self, gain: float, power: float, position: Tuple[float, float]):
+		if len(position) != 2:
+			raise Exception(f"Invalid transmitter position. Must be 2-dimensional: {position}")
+		self.gain = gain
+		self.power = power
+		self.position = position
+		self.x = position[0]
+		self.y = position[1]
 
-	Raises:
-		Exception: If tuple representing the tracked object's position does not have length of 2
-		Exception: If tuples representing observation points' positions and gains do not have matching lengths
-		Exception: If the seed for path loss randomization is not a numeric type or `None` type
-	"""
-	# Validate parameters
-	if len(pos_tx) != 2:
-		raise Exception(f"Object position must be a 2-float tuple. Invalid position: {pos_tx}")
-	x_real, y_real = pos_tx[0], pos_tx[1]
-	NUM = len(x_coords_rx)
-	if NUM != len(y_coords_rx) or NUM != len(gains_rx):
-		raise Exception(\
-			"Observation points' tuples must match in length." + \
-				f"\n\tOP x-coords ({len(x_coords_rx)}): {x_coords_rx}" + \
-				f"\n\tOP y-coords ({len(y_coords_rx)}): {y_coords_rx}" + \
-				f"\n\tOP gains ({len(gains_rx)}): {gains_rx}" \
-		)
-	if not (type(seed) is int or type(seed) is float or seed is None):
-		raise Exception(f"Seed for path loss randomization has invalid type {type(seed)}: {seed}")
+def calculate_real_received_powers(wavelength: float, tx: Transmitter, rx: Receivers, standard_deviation: float = 0) -> List[float]:
+	powers_rx = list()
+	for x,y,g in zip(rx.x_coords, rx.y_coords, rx.gains):
+		dist = util.distance_between(tx.position, (x,y))
+		pwr = friis.standard_form(tx.power, tx.gain, g, wavelength, dist)
+		if standard_deviation != 0:
+			pwr += numpy.random.normal(0, standard_deviation)
+		powers_rx.append(pwr)
+	return powers_rx
 
+def estimate_position_rss(rx: Receivers, powers: List[float]) -> Tuple[float, float]:
+	x_est = 0
+	y_est = 0
+#	power_avg_db = numpy.average(powers_rx)
+#	power_avg_linear = 10**(power_avg_db/10)
+	power_avg_linear = 0
+	for p in powers:
+		power_avg_linear += 10**(p/10)
+	power_avg_linear = power_avg_linear / len(powers)
+	# print(f"Average received power: {power_avg_linear}")
+	for i in range(0, len(rx.x_coords)):
+		# print(f"{x_coords[i]}, {y_coords[i]}, {powers_rx[i]}")
+		x_est += rx.x_coords[i] * 10**(powers[i]/10)
+		y_est += rx.y_coords[i] * 10**(powers[i]/10)
+	x_est = ( x_est / len(rx.x_coords) ) / power_avg_linear
+	y_est = ( y_est / len(rx.y_coords) ) / power_avg_linear
+	return (x_est, y_est)
+
+def test(wavelength: float, tx: Transmitter, rx: Receivers, standard_deviation: float = 0) -> None:
 	# Output test details
 	print("Running test with the following setup:")
-	print(f"- Signal of wavelength {wavelength}m transmitting from ({x_real}m, {y_real}m) with power of {p_tx}dBm and gain of {g_tx}dBi")
-	for i,(x,y,g) in enumerate(zip(x_coords_rx, y_coords_rx, gains_rx)):
+	print(f"- Signal of wavelength {wavelength}m transmitting from {tx.position} with power of {tx.power}dBm and gain of {tx.gain}dBi")
+	for i,(x,y,g) in enumerate(zip(rx.x_coords, rx.y_coords, rx.gains)):
 		print(f"- OP{i+1} receiving signal at {(x,y)} with gain of {g}dBi")
 
 	# Calculate received signal powers based on exact distances between the tracked object and observation points to prepare for simulating realistic path loss
 	# If the randomness seed is set, then a random value will be generated and summed to each received path loss to simulate non-ideal conditions
-	powers_rx = list()
-	for x,y,g in zip(x_coords_rx, y_coords_rx, gains_rx):
-		dist = util.distance_between((x,y), (x_real, y_real))
-		p_rx = friis.standard_form(p_tx, g_tx, g, wavelength, dist)
-		if seed is not None:
-			p_rx += numpy.random.normal(0, seed)
-		powers_rx.append(p_rx)
+	powers_rx = calculate_real_received_powers(wavelength, tx, rx, standard_deviation=standard_deviation)
+
+	print(tx.position)
+	estimate_position_rss(rx, powers_rx)
 
 	# Calculate distances between the tracked object and observation points based on the simulated path losses
 	calculated_distances = list()
-	for p,g in zip(powers_rx, gains_rx):
-		calculated_distances.append(friis.distance_form(p, p_tx, g, g_tx, wavelength))
+	for p,g in zip(powers_rx, rx.gains):
+		calculated_distances.append( friis.distance_form(p, tx.power, g, tx.gain, wavelength) )
 
-	# Estimate the tracked object's position based on calculated distances. There should be as little overhead as possible between start_time and end_time so as not
-	# to misrepresent/inflate the amount of time it takes to estimate position
-	calculated_distances_tuple = tuple(calculated_distances)
-	start_time = time.time()
-	roots = positioning.calculate_roots(NUM, calculated_distances_tuple, x_coords_rx, y_coords_rx)
-	estimated_pos = positioning.estimate_position(roots)
-	end_time = time.time()
-	x_estm, y_estm = estimated_pos
+	roots = positioning.calculate_roots(rx.num, calculated_distances, rx.x_coords, rx.y_coords)
+	print(positioning.estimate_position_by_roots(roots))
 
-	# Calculate comparisons between actual and estimated values
-	x_erro = util.approximation_error(exact=x_real, approx=x_estm) * 100
-	y_erro = util.approximation_error(exact=y_real, approx=y_estm) * 100
-	x_diff = abs(x_real - x_estm)
-	y_diff = abs(y_real - y_estm)
-	dist = util.distance_between((x_real,y_real),(x_estm,y_estm))
-
-	# Output results
-	ROUND_AMT: int = 3
-	print(f"Exact position:          ({round(x_real, ROUND_AMT)}m, {round(y_real, ROUND_AMT)}m)")
-	print(f"Estimated position:      ({round(x_estm, ROUND_AMT)}m, {round(y_estm, ROUND_AMT)}m)")
-	print(f"Estimation elapsed time: {round(end_time - start_time, 3)}sec")
-	print(f"Percent difference:      ({round(x_erro, ROUND_AMT)}%, {round(y_erro, ROUND_AMT)}%)")
-	print(f"Delta values:            ({round(x_diff, ROUND_AMT)}m, {round(y_diff, ROUND_AMT)}m)")
-	print(f"Distance apart:          {round(dist, ROUND_AMT)}m")
-
+def plot(x_est: float, y_est: float, tx: Transmitter, rx: Receivers, round_amt=3) -> None:
 	# Visualize positions
-	real = round(x_real, ROUND_AMT), round(y_real, ROUND_AMT)
-	estm = round(x_estm, ROUND_AMT), round(y_estm, ROUND_AMT)
+	real = round(tx.x, round_amt), round(tx.y, round_amt)
+	estm = round(x_est, round_amt), round(y_est, round_amt)
 	_, ax = plt.subplots()
-	plt.plot(x_real, y_real, '*')
+	plt.plot(tx.x, tx.y, '*')
 	ax.annotate( f"actual {real}", real )
-	plt.plot(x_estm, y_estm, 'o')
+	plt.plot(x_est, y_est, 'o')
 	ax.annotate( f"estimate {estm}", estm )
-	for i,(x,y) in enumerate(zip(x_coords_rx, y_coords_rx)):
-		op = round(x, ROUND_AMT), round(y, ROUND_AMT)
+	for i,(x,y) in enumerate( zip(rx.x_coords, rx.y_coords) ):
+		op = round(x, round_amt), round(y, round_amt)
 		plt.plot(x, y, '.')
 		ax.annotate( f"OP{i+1}{op}", op )
 	plt.show(block=True)
@@ -107,11 +103,19 @@ def main():
 #	x = ( 0.00, 3.00, 10.00 )
 #	y = ( 0.00, 8.00,  5.00 )
 #	g = ( 0.00, 0.00,  0.00 )
-	x = ( 0.00, 0.00,  0.00, 5.00,  5.00, 10.00, 10.00, 10.00 )
-	y = ( 0.00, 5.00, 10.00, 0.00, 10.00,  0.00,  5.00, 10.00 )
-	g = ( 0.00, 0.00,  0.00, 0.00,  0.00,  0.00,  0.00,  0.00 )
+	tx = Transmitter(0, 0, (5,5))
+	rx = Receivers( \
+		[ 0.00, 0.00,  0.00, 5.00,  5.00, 10.00, 10.00, 10.00 ], \
+		[ 0.00, 5.00, 10.00, 0.00, 10.00,  0.00,  5.00, 10.00 ], \
+		[ 0.00, 0.00,  0.00, 0.00,  0.00,  0.00,  0.00,  0.00 ] \
+	)
 	try:
-		test(pos_tx=(4,4), wavelength=0.1, p_tx=0, g_tx=0, x_coords_rx=x, y_coords_rx=y, gains_rx=g, seed=0.5)
+		# for sd in range(0, 11):
+		# 	print(f"sd {sd}:")
+		# 	for _ in range(1, 10):
+		# 		test(wavelength=0.1, tx=tx, rx=rx, standard_deviation=sd)
+		# 		time.sleep(0.5)
+		test(wavelength=0.1, tx=tx, rx=rx)
 	except Exception as e:
 		print(e, file=sys.stderr)
 
