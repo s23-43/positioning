@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import csv
 import friis
 import numpy
 import positioning
@@ -11,6 +12,19 @@ from matplotlib import pyplot as plt
 
 class Receivers:
 	def __init__(self, x_coords: List[float], y_coords: List[float], gains: List[float]):
+		"""
+		Initializes a collection of receivers. Lists of coodinates and gains must be equal in length.
+		For every index, i, Receiver i is at position (x-coords[i], y-coords[i]) and has a gain of
+		gains[i].
+
+		Args:
+			x_coords: List of receivers' x-coordinates
+			y_corods: List of receivers' y-coordinates
+			gains: List of receivers' gains
+
+		Raises:
+			Exception: If lists of x-coordinates, y-coordinates, and gains are not equal in length.
+		"""
 		NUM = len(x_coords)
 		if NUM != len(y_coords) or NUM != len(gains):
 			raise Exception( \
@@ -26,13 +40,24 @@ class Receivers:
 
 class Transmitter:
 	def __init__(self, gain: float, power: float, position: Tuple[float, float]):
-		if len(position) != 2:
-			raise Exception(f"Invalid transmitter position. Must be 2-dimensional: {position}")
+		self.set_position(position)
 		self.gain = gain
 		self.power = power
-		self.position = position
-		self.x = position[0]
-		self.y = position[1]
+	def set_position(self, new_position: Tuple[float, float]) -> None:
+		if len(new_position) != 2:
+			raise Exception(f"Invalid transmitter position. Must be 2-dimensional tuple. Got: {new_position}")
+		self.position = new_position
+		self.x = new_position[0]
+		self.y = new_position[1]
+
+class ResultData:
+	def __init__(self, pos_estm: Tuple[float, float] = (0, 0), time: float = 0):
+		if len(pos_estm) != 2:
+			raise Exception(f"Invalid result position. Must be 2-dimensional tuple. Got: {pos_estm}")
+		self.estimated_position = pos_estm
+		self.x = pos_estm[0]
+		self.y = pos_estm[1]
+		self.elapsed_time = time
 
 def calculate_real_received_powers(wavelength: float, tx: Transmitter, rx: Receivers, standard_deviation: float = 0) -> List[float]:
 	powers_rx = list()
@@ -62,12 +87,12 @@ def estimate_position_rss(rx: Receivers, powers: List[float]) -> Tuple[float, fl
 	y_est = ( y_est / len(rx.y_coords) ) / power_avg_linear
 	return (x_est, y_est)
 
-def test(wavelength: float, tx: Transmitter, rx: Receivers, standard_deviation: float = 0) -> None:
+def test(wavelength: float, tx: Transmitter, rx: Receivers, standard_deviation: float = 0) -> ResultData:
 	# Output test details
-	print("Running test with the following setup:")
-	print(f"- Signal of wavelength {wavelength}m transmitting from {tx.position} with power of {tx.power}dBm and gain of {tx.gain}dBi")
-	for i,(x,y,g) in enumerate(zip(rx.x_coords, rx.y_coords, rx.gains)):
-		print(f"- OP{i+1} receiving signal at {(x,y)} with gain of {g}dBi")
+#	print("Running test with the following setup:")
+#	print(f"- Signal of wavelength {wavelength}m transmitting from {tx.position} with power of {tx.power}dBm and gain of {tx.gain}dBi")
+#	for i,(x,y,g) in enumerate(zip(rx.x_coords, rx.y_coords, rx.gains)):
+#		print(f"- OP{i} receiving signal at {(x,y)} with gain of {g}dBi")
 
 	# Calculate received signal powers based on exact distances between the tracked object and observation points to prepare for simulating realistic path loss
 	# If the randomness seed is set, then a random value will be generated and summed to each received path loss to simulate non-ideal conditions
@@ -81,8 +106,12 @@ def test(wavelength: float, tx: Transmitter, rx: Receivers, standard_deviation: 
 	for p,g in zip(powers_rx, rx.gains):
 		calculated_distances.append( friis.distance_form(p, tx.power, g, tx.gain, wavelength) )
 
+	start_time = time.time()
 	roots = positioning.calculate_roots(rx.num, calculated_distances, rx.x_coords, rx.y_coords)
-	print(positioning.estimate_position_by_roots(roots))
+	estimated_position = positioning.estimate_position_by_roots(roots)
+	end_time = time.time()
+
+	return ResultData(estimated_position, end_time - start_time)
 
 def plot(x_est: float, y_est: float, tx: Transmitter, rx: Receivers, round_amt=3) -> None:
 	# Visualize positions
@@ -96,14 +125,14 @@ def plot(x_est: float, y_est: float, tx: Transmitter, rx: Receivers, round_amt=3
 	for i,(x,y) in enumerate( zip(rx.x_coords, rx.y_coords) ):
 		op = round(x, round_amt), round(y, round_amt)
 		plt.plot(x, y, '.')
-		ax.annotate( f"OP{i+1}{op}", op )
+		ax.annotate( f"OP{i}{op}", op )
 	plt.show(block=True)
 
 def main():
 #	x = ( 0.00, 3.00, 10.00 )
 #	y = ( 0.00, 8.00,  5.00 )
 #	g = ( 0.00, 0.00,  0.00 )
-	tx = Transmitter(0, 0, (5,5))
+	tx = Transmitter(0, 0, (1,9))
 	rx = Receivers( \
 		[ 0.00, 0.00,  0.00, 5.00,  5.00, 10.00, 10.00, 10.00 ], \
 		[ 0.00, 5.00, 10.00, 0.00, 10.00,  0.00,  5.00, 10.00 ], \
@@ -115,7 +144,20 @@ def main():
 		# 	for _ in range(1, 10):
 		# 		test(wavelength=0.1, tx=tx, rx=rx, standard_deviation=sd)
 		# 		time.sleep(0.5)
-		test(wavelength=0.1, tx=tx, rx=rx)
+		rows = list()
+		for x in range(1, 10):
+			for y in range (1, 10):
+				tx.set_position( (x,y) )
+				result = test(0.1, tx, rx, standard_deviation=0.1)
+				x_est = round(result.x, 3)
+				y_est = round(result.y, 3)
+				time = round(result.elapsed_time, 3)
+				rows.append( [x, x_est, y, y_est, time] )
+		with open ("results.csv", "w", newline='') as file:
+			writer = csv.writer(file)
+			writer.writerow( ["Real x", "Estimated x", "Real y", "Estimated y" "Elapsed time (s)"] )
+			writer.writerows(rows)
+
 	except Exception as e:
 		print(e, file=sys.stderr)
 
