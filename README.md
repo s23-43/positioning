@@ -1,5 +1,5 @@
 # Positioning Algorithm for S23-43's Experimental Cellular Positioning System
-This is Team S23-43's implementation of a positioning algorithm, which is just one part of our senior design project under The Bradley Department of Electrical and Computer Engineering Department at Virginia Tech. Our objective is to design and build a positioning system that wirelessly tracks an object's location, taking advantage of cellular communications standards. Messages are sent over the air between software-defined radios on the object and on no fewer than 3 observation points (OPs). These wireless messages provide data to calculate path losses between the object and the OPs, which then allows a central computer to estimate the object's position with this in-house algorithm. This system would ideally be able to scale up to support tracing several objects in a large warehouse.
+This is Team S23-43's implementation of a positioning algorithm, which is just one part of our senior design project. Our objective is to design and build a positioning system that wirelessly tracks an object's location, taking advantage of cellular communications standards. Messages are sent over the air between software-defined radios on the object and on no fewer than 3 observation points (OPs). These wireless messages provide data to calculate path losses between the object and the OPs, which then allows a central computer to estimate the object's position with this in-house algorithm. This system would ideally be able to scale up to support tracing several objects in a large warehouse.
 
 # Dependencies
 ## With Docker
@@ -11,6 +11,7 @@ Run the following commands on your instance of Ubuntu 20.04:
 - `sudo apt install python3 python3-pip`
 - `pip install --upgrade pip`
 - `pip install sympy numpy`
+
 Now you should be good to go!
 
 # How to use
