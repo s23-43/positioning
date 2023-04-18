@@ -155,7 +155,7 @@ def main():
 				rows.append( [x, x_est, y, y_est, time] )
 		with open ("results.csv", "w", newline='') as file:
 			writer = csv.writer(file)
-			writer.writerow( ["Real x", "Estimated x", "Real y", "Estimated y" "Elapsed time (s)"] )
+			writer.writerow( ["Real x", "Estimated x", "Real y", "Estimated y", "Elapsed time (s)"] )
 			writer.writerows(rows)
 
 	except Exception as e:
