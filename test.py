@@ -88,12 +88,6 @@ def estimate_position_rss(rx: Receivers, powers: List[float]) -> Tuple[float, fl
 	return (x_est, y_est)
 
 def test(wavelength: float, tx: Transmitter, rx: Receivers, standard_deviation: float = 0) -> ResultData:
-	# Output test details
-#	print("Running test with the following setup:")
-#	print(f"- Signal of wavelength {wavelength}m transmitting from {tx.position} with power of {tx.power}dBm and gain of {tx.gain}dBi")
-#	for i,(x,y,g) in enumerate(zip(rx.x_coords, rx.y_coords, rx.gains)):
-#		print(f"- OP{i} receiving signal at {(x,y)} with gain of {g}dBi")
-
 	# Calculate received signal powers based on exact distances between the tracked object and observation points to prepare for simulating realistic path loss
 	# If the randomness seed is set, then a random value will be generated and summed to each received path loss to simulate non-ideal conditions
 	powers_rx = calculate_real_received_powers(wavelength, tx, rx, standard_deviation=standard_deviation)
@@ -129,9 +123,6 @@ def plot(x_est: float, y_est: float, tx: Transmitter, rx: Receivers, round_amt=3
 	plt.show(block=True)
 
 def main():
-#	x = ( 0.00, 3.00, 10.00 )
-#	y = ( 0.00, 8.00,  5.00 )
-#	g = ( 0.00, 0.00,  0.00 )
 	tx = Transmitter(0, 0, (1,9))
 	rx = Receivers( \
 		[ 0.00, 0.00,  0.00, 5.00,  5.00, 10.00, 10.00, 10.00 ], \
@@ -139,11 +130,6 @@ def main():
 		[ 0.00, 0.00,  0.00, 0.00,  0.00,  0.00,  0.00,  0.00 ] \
 	)
 	try:
-		# for sd in range(0, 11):
-		# 	print(f"sd {sd}:")
-		# 	for _ in range(1, 10):
-		# 		test(wavelength=0.1, tx=tx, rx=rx, standard_deviation=sd)
-		# 		time.sleep(0.5)
 		rows = list()
 		for x in range(1, 10):
 			for y in range (1, 10):

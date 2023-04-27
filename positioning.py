@@ -9,7 +9,16 @@ from typing import List, Tuple
 
 def calculate_roots(num: int, radii: List[float], x_coords: List[float], y_coords: List[float]) -> list:
 	"""
-	TODO: Add function description
+	Calculates the intersections between the circumferences generated from the radii
+
+	Args:
+		num: Number of OPs
+		radii: List of distances between transmitter and receivers
+		x_coords: List of receivers' x-coordinates
+		y_coords: List of receivers' y-coordinates
+
+	Returns:
+		A list of intersections between the circumferences generated from the radii
 	"""
 	funcs = list()
 	x,y = sympy.symbols("x,y")
