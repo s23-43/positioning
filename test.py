@@ -93,7 +93,7 @@ def calculate_real_received_powers(wavelength: float, tx: Transmitter, rx: Recei
 	Args:
 		wavelength: Wavelength of signal
 		tx: Transmitter object
-		rx: Receiver object
+		rx: Receivers object
 		standard_deviation (optional): Defines the standard deviation used for random-number generator to simulate non-ideal conditions
 
 	Returns:
@@ -109,6 +109,16 @@ def calculate_real_received_powers(wavelength: float, tx: Transmitter, rx: Recei
 	return powers_rx
 
 def estimate_position_rss(rx: Receivers, powers: List[float]) -> Tuple[float, float]:
+	"""
+	Alternative experimental position estimation algorithm based on received signal strength. Not fully tested or vetted.
+
+	Args:
+		rx: Receivers object
+		powers: List of received signal strengths
+
+	Returns:
+		Estimated location of tracked object as 2-length tuple
+	"""
 	x_est = 0
 	y_est = 0
 #	power_avg_db = numpy.average(powers_rx)
@@ -127,6 +137,18 @@ def estimate_position_rss(rx: Receivers, powers: List[float]) -> Tuple[float, fl
 	return (x_est, y_est)
 
 def test(wavelength: float, tx: Transmitter, rx: Receivers, standard_deviation: float = 0) -> ResultData:
+	"""
+	Runs single instance of simulated estimation. Calculates the expected distance between transmitter and each receiver to estimate position with optional randomness to simulate non-ideal conditions
+
+	Args:
+		wavelength: Wavelength of signal
+		tx: Transmitter object
+		rx: Receivers object
+		standard_deviation (optional): Standard deviation of random number generator to simulate non-ideal conditions when calculating received signal strength
+
+	Returns:
+		A ResultData object with results from the simulation
+	"""
 	# Calculate received signal powers based on exact distances between the tracked object and observation points to prepare for simulating realistic path loss
 	# If the randomness seed is set, then a random value will be generated and summed to each received path loss to simulate non-ideal conditions
 	powers_rx = calculate_real_received_powers(wavelength, tx, rx, standard_deviation=standard_deviation)
@@ -147,6 +169,16 @@ def test(wavelength: float, tx: Transmitter, rx: Receivers, standard_deviation: 
 	return ResultData(estimated_position, end_time - start_time)
 
 def plot(x_est: float, y_est: float, tx: Transmitter, rx: Receivers, round_amt=3) -> None:
+	"""
+	Plots the estimated location of the transmitter and the true locations of the receivers and transmitter on a 2D graph
+
+	Args:
+		x_est: Estimated x-position
+		y_est: Estimated y-position
+		tx: Transmitter object
+		rx: Receivers object
+		round_amt (optional): Number of decimal places to round values of coordinates that are displayed on the graph
+	"""
 	# Visualize positions
 	real = round(tx.x, round_amt), round(tx.y, round_amt)
 	estm = round(x_est, round_amt), round(y_est, round_amt)
