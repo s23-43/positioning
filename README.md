@@ -14,8 +14,7 @@ Run the following commands on your instance of Ubuntu 20.04:
 
 Now you should be good to go!
 
-# How to use
-## Docker (optional)
+# Run in Docker container (optional)
 1. `docker build -t <IMAGE_NAME> /path/to/repo`
 2. `docker run --rm -v /path/to/repo:/app -it <IMAGE_NAME>`
 3. The container should be running, and you should be in its terminal.
