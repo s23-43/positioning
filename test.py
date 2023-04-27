@@ -40,10 +40,27 @@ class Receivers:
 
 class Transmitter:
 	def __init__(self, gain: float, power: float, position: Tuple[float, float]):
+		"""
+		Initializes a transmitter
+
+		Args:
+			gain: Transmitted antenna gain
+			power: Transmitted signal power
+			position: 2D position of transmitter
+		"""
 		self.set_position(position)
 		self.gain = gain
 		self.power = power
 	def set_position(self, new_position: Tuple[float, float]) -> None:
+		"""
+		Sets the transmitter's position, setting both a 2-variable tuple and separate x- and y-coordinates
+
+		Args:
+			new_position: 2D position of transmitter
+
+		Raises:
+			Exception: If new position is not a 2-length tuple
+		"""
 		if len(new_position) != 2:
 			raise Exception(f"Invalid transmitter position. Must be 2-dimensional tuple. Got: {new_position}")
 		self.position = new_position
@@ -52,6 +69,16 @@ class Transmitter:
 
 class ResultData:
 	def __init__(self, pos_estm: Tuple[float, float] = (0, 0), time: float = 0):
+		"""
+		Initializes a class that stores resulting data from a single instance of a test
+
+		Args:
+			pos_estm: Estimated position of tracked object
+			time: Time elapsed for estimation
+
+		Raises:
+			Exception: If position estimation is not a 2-length tuple
+		"""
 		if len(pos_estm) != 2:
 			raise Exception(f"Invalid result position. Must be 2-dimensional tuple. Got: {pos_estm}")
 		self.estimated_position = pos_estm
@@ -60,6 +87,18 @@ class ResultData:
 		self.elapsed_time = time
 
 def calculate_real_received_powers(wavelength: float, tx: Transmitter, rx: Receivers, standard_deviation: float = 0) -> List[float]:
+	"""
+	Calculates received signal strength of each receiver. Has optional randomness parameter to simulate non-ideal conditions
+
+	Args:
+		wavelength: Wavelength of signal
+		tx: Transmitter object
+		rx: Receiver object
+		standard_deviation (optional): Defines the standard deviation used for random-number generator to simulate non-ideal conditions
+
+	Returns:
+		A list of received signal strengths
+	"""
 	powers_rx = list()
 	for x,y,g in zip(rx.x_coords, rx.y_coords, rx.gains):
 		dist = util.distance_between(tx.position, (x,y))
