@@ -153,9 +153,6 @@ def test(wavelength: float, tx: Transmitter, rx: Receivers, standard_deviation: 
 	# If the randomness seed is set, then a random value will be generated and summed to each received path loss to simulate non-ideal conditions
 	powers_rx = calculate_real_received_powers(wavelength, tx, rx, standard_deviation=standard_deviation)
 
-	print(tx.position)
-	estimate_position_rss(rx, powers_rx)
-
 	# Calculate distances between the tracked object and observation points based on the simulated path losses
 	calculated_distances = list()
 	for p,g in zip(powers_rx, rx.gains):
@@ -210,6 +207,7 @@ def main():
 				y_est = round(result.y, 3)
 				time = round(result.elapsed_time, 3)
 				rows.append( [x, x_est, y, y_est, time] )
+				print(f"{(x,y)} ~ {(x_est,y_est)}")
 		with open ("results.csv", "w", newline='') as file:
 			writer = csv.writer(file)
 			writer.writerow( ["Real x", "Estimated x", "Real y", "Estimated y", "Elapsed time (s)"] )
